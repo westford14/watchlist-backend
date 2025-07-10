@@ -42,8 +42,8 @@ pub async fn list_movies_by_user_handler(
     )
     .await?;
     Ok(Json(PaginatedResponse {
-        page: page,
-        per_page: per_page,
+        page,
+        per_page,
         total: total_movies,
         data: movies,
     }))

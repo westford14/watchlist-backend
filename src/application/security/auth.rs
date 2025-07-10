@@ -22,7 +22,7 @@ pub async fn logout(refresh_claims: RefreshClaims, state: SharedState) -> Result
 
     // Decode and validate the refresh token.
     if !validate_token_type(&refresh_claims, JwtTokenType::RefreshToken) {
-        return Err(AuthError::InvalidToken.into());
+        return Err(AuthError::InvalidToken);
     }
     revoke_refresh_token(&refresh_claims, &state).await?;
     Ok(())
@@ -34,7 +34,7 @@ pub async fn refresh(
 ) -> Result<JwtTokens, AuthError> {
     // Decode and validate the refresh token.
     if !validate_token_type(&refresh_claims, JwtTokenType::RefreshToken) {
-        return Err(AuthError::InvalidToken.into());
+        return Err(AuthError::InvalidToken);
     }
 
     // Check if revoked tokens are enabled.

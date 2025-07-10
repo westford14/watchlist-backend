@@ -36,7 +36,7 @@ impl std::fmt::Display for APIVersion {
 pub fn parse_version(version: &str) -> Result<APIVersion, APIError> {
     version.parse().map_or_else(
         |_| Err(ApiVersionError::InvalidVersion(version.to_owned()).into()),
-        |v| Ok(v),
+        Ok,
     )
 }
 

@@ -2,8 +2,8 @@ use std::{fmt, net::SocketAddr};
 
 use jsonwebtoken::{DecodingKey, EncodingKey};
 
-use crate::infrastructure::database::database::DatabaseOptions;
-use crate::infrastructure::database::postgres::options::PostgresOptions;
+use crate::infrastructure::database::DatabaseOptions;
+use crate::infrastructure::database::PostgresOptions;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -164,12 +164,9 @@ fn env_get_or(key: &str, default: &str) -> String {
 
 #[inline]
 fn env_parse<T: std::str::FromStr>(key: &str) -> T {
-    env_get(key).parse().map_or_else(
-        |_| {
-            let msg = format!("Failed to parse: {}", key);
-            tracing::error!(msg);
-            panic!("{msg}");
-        },
-        |v| v,
-    )
+    env_get(key).parse().unwrap_or_else(|_| {
+        let msg = format!("Failed to parse: {}", key);
+        tracing::error!(msg);
+        panic!("{msg}");
+    })
 }
