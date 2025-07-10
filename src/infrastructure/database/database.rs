@@ -1,8 +1,8 @@
 use sqlx::{PgConnection, PgPool};
 use thiserror::Error;
 
-use crate::infrastructure::database::postgres::options::PostgresOptions;
-use crate::infrastructure::database::postgres::postgres::PostgresDatabase;
+use crate::infrastructure::database::postgres::PostgresDatabase;
+use crate::infrastructure::database::postgres::PostgresOptions;
 
 pub type DatabasePool = PgPool;
 pub type DatabaseConnection = PgConnection;

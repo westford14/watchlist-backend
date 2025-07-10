@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::{
     api::server,
     application::{config, state::AppState},
-    infrastructure::{database::database::Database, redis},
+    infrastructure::{database::Database, redis},
 };
 
 pub async fn run() {

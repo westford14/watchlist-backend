@@ -23,7 +23,7 @@ use tokio::{
 use tower_http::cors::{Any, CorsLayer};
 
 use crate::{
-    api::routes::{auth_routes, user_routes, movie_routes},
+    api::routes::{auth_routes, movie_routes, user_routes},
     api::{error::APIError, handlers::healthz_handlers},
     application::state::SharedState,
 };
@@ -54,7 +54,7 @@ pub async fn start(state: SharedState) {
         // User Routes
         .nest("/{version}/user", user_routes::routes())
         // Movie Routes
-        .nest("/{version}/movie", movie_routes::routes()) 
+        .nest("/{version}/movie", movie_routes::routes())
         .fallback(error_404_handler)
         .with_state(Arc::clone(&state))
         .layer(cors_layer)

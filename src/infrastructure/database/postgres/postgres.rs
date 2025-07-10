@@ -5,7 +5,6 @@ use crate::infrastructure::database::database::{DatabaseError, DatabaseOptions};
 #[non_exhaustive]
 pub struct PostgresDatabase {
     pool: PgPool,
-    options: DatabaseOptions,
 }
 
 impl PostgresDatabase {
@@ -22,7 +21,7 @@ impl PostgresDatabase {
 
         tracing::info!("Connected to PostgreSQL database.");
 
-        Ok(Self { pool, options })
+        Ok(Self { pool })
     }
 
     pub const fn pool(&self) -> &PgPool {

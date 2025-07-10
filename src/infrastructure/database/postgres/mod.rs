@@ -1,2 +1,5 @@
-pub mod options;
-pub mod postgres;
+mod options;
+mod postgres;
+
+pub use options::PostgresOptions;
+pub use postgres::PostgresDatabase;
