@@ -11,7 +11,6 @@ use axum::{
 };
 use chrono::Utc;
 use hyper::Method;
-use hyper::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde_json::json;
 use tokio::{
     net::TcpListener,
@@ -40,9 +39,10 @@ pub async fn start(state: SharedState) {
             Method::POST,
             Method::PATCH,
             Method::DELETE,
+            Method::OPTIONS,
         ])
         //.allow_credentials(true)
-        .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
+        .allow_headers(Any);
     // Build the router.
     let router = Router::new()
         .route("/", get(root_handler))

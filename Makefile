@@ -18,7 +18,7 @@ stop-full:
 	docker compose -f docker-compose-full.yaml down
 .PHONY: stop-full
 
-start-full: start-server
+start-full:
 	docker compose -f docker-compose-full.yaml up --build
 .PHONY: start-full
 
