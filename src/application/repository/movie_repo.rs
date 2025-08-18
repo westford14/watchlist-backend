@@ -104,6 +104,14 @@ pub async fn get_by_name(name: &str, state: &SharedState) -> RepositoryResult<Mo
     Ok(movie)
 }
 
+pub async fn get_random_movie(state: &SharedState) -> RepositoryResult<Movie> {
+    let movie = sqlx::query_as::<_, Movie>("SELECT * FROM movies TABLESAMPLE BERNOULLI(1)")
+        .fetch_one(&state.db_pool)
+        .await?;
+
+    Ok(movie)
+}
+
 pub async fn update(movie: Movie, state: &SharedState) -> RepositoryResult<Movie> {
     tracing::trace!("movie: {:#?}", movie);
     let time_now = Utc::now().naive_utc();

@@ -131,16 +131,41 @@ pub async fn delete_movie_handler(
     }
 }
 
+pub async fn lucky_movie_handler(
+    access_claims: AccessClaims,
+    Path(version): Path<String>,
+    State(state): State<SharedState>,
+) -> Result<Json<Movie>, APIError> {
+    let api_version: APIVersion = version::parse_version(&version)?;
+    tracing::trace!("api version: {}", api_version);
+    tracing::trace!("authentication details: {:#?}", access_claims);
+    access_claims.validate_role_admin()?;
+    let movie = movie_repo::get_random_movie(&state)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => {
+                let user_error = MovieError::MovieFailure("could not gather movie".to_string());
+                (user_error.status_code(), APIErrorEntry::from(user_error)).into()
+            }
+            _ => APIError::from(e),
+        })?;
+
+    Ok(Json(movie))
+}
+
 #[derive(Debug, Error)]
 enum MovieError {
     #[error("movie not found: {0}")]
     MovieNotFound(Uuid),
+    #[error("internal issue: {0}")]
+    MovieFailure(String),
 }
 
 impl MovieError {
     const fn status_code(&self) -> StatusCode {
         match self {
             Self::MovieNotFound(_) => StatusCode::NOT_FOUND,
+            Self::MovieFailure(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -158,6 +183,16 @@ impl From<MovieError> for APIErrorEntry {
                 .instance(&format!("/api/v1/movie/{}", movie_id))
                 .trace_id()
                 .help(&format!("please check if the user ID is correct or refer to our documentation at {}#errors for more information", API_DOCUMENT_URL))
+                .doc_url(),
+            MovieError::MovieFailure(issue) => Self::new(&message)
+                .code(APIErrorCode::UserNotFound)
+                .kind(APIErrorKind::ResourceNotFound)
+                .description(&format!("movie could not be found with issues {}", issue))
+                .detail(serde_json::json!({"issue": issue}))
+                .reason("must be an existing user")
+                .instance("/api/v1/movie/lucky")
+                .trace_id()
+                .help(&format!("refer to our documentation at {}#errors for more information", API_DOCUMENT_URL))
                 .doc_url(),
         }
     }
