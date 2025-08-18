@@ -1,5 +1,6 @@
 lint:
 	cargo fmt --all
+	cargo clippy --all-targets --all-features
 .PHONY: lint
 
 test:
