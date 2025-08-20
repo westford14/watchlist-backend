@@ -119,6 +119,7 @@ pub enum APIErrorCode {
     AuthenticationRevokedTokensInactive,
     AuthenticationForbidden,
     UserNotFound,
+    NoteNotFound,
     TransactionNotFound,
     TransferInsufficientFunds,
     TransferSourceAccountNotFound,
