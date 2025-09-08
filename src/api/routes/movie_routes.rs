@@ -6,7 +6,7 @@ use axum::{
 use crate::{
     api::handlers::movie_handlers::{
         add_movie_handler, delete_movie_handler, get_movie_handler, list_movies_by_user_handler,
-        list_movies_handler, lucky_movie_handler, update_movie_handler,
+        list_movies_handler, lucky_movie_handler, search_movie_handler, update_movie_handler,
     },
     application::state::SharedState,
 };
@@ -20,4 +20,5 @@ pub fn routes() -> Router<SharedState> {
         .route("/{id}", put(update_movie_handler))
         .route("/{id}", delete(delete_movie_handler))
         .route("/lucky", get(lucky_movie_handler))
+        .route("/search", get(search_movie_handler))
 }

@@ -32,3 +32,8 @@ pub struct Movie {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct MovieQuery {
+    pub name: String,
+}

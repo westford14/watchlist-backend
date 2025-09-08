@@ -147,3 +147,12 @@ pub async fn delete(id: Uuid, state: &SharedState) -> RepositoryResult<bool> {
 
     Ok(query_result.rows_affected() == 1)
 }
+
+pub async fn search_movie_name(name: String, state: &SharedState) -> RepositoryResult<Vec<Movie>> {
+    let query_result = sqlx::query_as::<_, Movie>("SELECT * FROM movies WHERE name ILIKE $1 ")
+        .bind(format!("%{}%", name))
+        .fetch_all(&state.db_pool)
+        .await?;
+
+    Ok(query_result)
+}

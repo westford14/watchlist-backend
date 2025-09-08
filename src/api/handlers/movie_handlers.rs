@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
 };
@@ -16,7 +16,7 @@ use crate::{
         security::jwt::{AccessClaims, ClaimsMethods},
         state::SharedState,
     },
-    domain::models::movie::{Movie, PaginatedResponse, PaginationParams},
+    domain::models::movie::{Movie, MovieQuery, PaginatedResponse, PaginationParams},
 };
 
 pub async fn list_movies_by_user_handler(
@@ -151,6 +151,21 @@ pub async fn lucky_movie_handler(
         })?;
 
     Ok(Json(movie))
+}
+
+pub async fn search_movie_handler(
+    access_claims: AccessClaims,
+    Path(version): Path<String>,
+    State(state): State<SharedState>,
+    params: Query<MovieQuery>,
+) -> Result<Json<Vec<Movie>>, APIError> {
+    let api_version: APIVersion = version::parse_version(&version)?;
+    tracing::trace!("api version: {}", api_version);
+    tracing::trace!("authentication details: {:#?}", access_claims);
+    access_claims.validate_role_admin()?;
+    let Query(params) = params;
+    let movies = movie_repo::search_movie_name(params.name, &state).await?;
+    Ok(Json(movies))
 }
 
 #[derive(Debug, Error)]
