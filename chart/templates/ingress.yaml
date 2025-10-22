@@ -5,6 +5,8 @@ metadata:
   name: {{ include "watchlist-backend.fullname" . }}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, OPTIONS, PUT, DELETE, PATCH, HEAD"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:

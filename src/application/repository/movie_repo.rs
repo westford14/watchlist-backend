@@ -7,8 +7,9 @@ use crate::{
     domain::models::movie::Movie,
 };
 
-pub async fn list_movie_length(state: &SharedState) -> RepositoryResult<i64> {
-    let total_movies: (i64,) = query_as("SELECT COUNT(*) FROM movies")
+pub async fn list_movie_length(username: &str, state: &SharedState) -> RepositoryResult<i64> {
+    let total_movies: (i64,) = query_as("SELECT COUNT(*) FROM movies WHERE username = $1")
+        .bind(username)
         .fetch_one(&state.db_pool)
         .await?;
 
@@ -104,10 +105,13 @@ pub async fn get_by_name(name: &str, state: &SharedState) -> RepositoryResult<Mo
     Ok(movie)
 }
 
-pub async fn get_random_movie(state: &SharedState) -> RepositoryResult<Movie> {
-    let movie = sqlx::query_as::<_, Movie>("SELECT * FROM movies TABLESAMPLE BERNOULLI(1)")
-        .fetch_one(&state.db_pool)
-        .await?;
+pub async fn get_random_movie(username: String, state: &SharedState) -> RepositoryResult<Movie> {
+    let movie: Movie = sqlx::query_as::<_, Movie>(
+        "SELECT * FROM movies TABLESAMPLE BERNOULLI(1) WHERE username = $1 ",
+    )
+    .bind(username)
+    .fetch_one(&state.db_pool)
+    .await?;
 
     Ok(movie)
 }

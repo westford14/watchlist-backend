@@ -37,3 +37,8 @@ pub struct Movie {
 pub struct MovieQuery {
     pub name: String,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct ListQuery {
+    pub username: String,
+}
