@@ -16,7 +16,7 @@ use crate::{
         security::jwt::{AccessClaims, ClaimsMethods},
         state::SharedState,
     },
-    domain::models::movie::{Movie, MovieQuery, PaginatedResponse, PaginationParams},
+    domain::models::movie::{ListQuery, Movie, MovieQuery, PaginatedResponse, PaginationParams},
 };
 
 pub async fn list_movies_by_user_handler(
@@ -31,7 +31,7 @@ pub async fn list_movies_by_user_handler(
     let page = pagination.page.unwrap_or(1);
     let per_page = pagination.per_page.unwrap_or(25);
     let offset = (page - 1) * per_page;
-    let total_movies = movie_repo::list_movie_length(&state).await?;
+    let total_movies = movie_repo::list_movie_length(&pagination.username, &state).await?;
 
     let movies = movie_repo::list_paginated(
         pagination.username,
@@ -47,18 +47,6 @@ pub async fn list_movies_by_user_handler(
         total: total_movies,
         data: movies,
     }))
-}
-
-pub async fn list_movies_handler(
-    api_version: APIVersion,
-    access_claims: AccessClaims,
-    State(state): State<SharedState>,
-) -> Result<Json<Vec<Movie>>, APIError> {
-    tracing::trace!("api version: {}", api_version);
-    tracing::trace!("authentication details: {:#?}", access_claims);
-    access_claims.validate_role_admin()?;
-    let movies = movie_repo::list(&state).await?;
-    Ok(Json(movies))
 }
 
 pub async fn get_movie_handler(
@@ -135,12 +123,13 @@ pub async fn lucky_movie_handler(
     access_claims: AccessClaims,
     Path(version): Path<String>,
     State(state): State<SharedState>,
+    Json(pagination): Json<ListQuery>,
 ) -> Result<Json<Movie>, APIError> {
     let api_version: APIVersion = version::parse_version(&version)?;
     tracing::trace!("api version: {}", api_version);
     tracing::trace!("authentication details: {:#?}", access_claims);
     access_claims.validate_role_admin()?;
-    let movie = movie_repo::get_random_movie(&state)
+    let movie = movie_repo::get_random_movie(pagination.username, &state)
         .await
         .map_err(|e| match e {
             sqlx::Error::RowNotFound => {
